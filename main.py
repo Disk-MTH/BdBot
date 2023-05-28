@@ -43,7 +43,16 @@ def log_command(user, command, *args):
     print(tl_log("command").format(user, command, args, utils.get_date_time()))
 
 
-def shutdown():
+async def check_command(ctx):
+    await ctx.message.delete()
+    print(tl_log("command").format(ctx.author, ctx.command.name, 0, utils.get_date_time()))
+    if not ctx.author.guild_permissions.administrator:
+        await ctx.send(tl_msg("no_perm").format(ctx.command.name))
+        return False
+    return True
+
+
+async def shutdown():
     await bd_bot.close()
     print(tl_log("off"))
 
@@ -59,6 +68,7 @@ async def on_ready():
     global guild
     global channel
     global role
+    global status
 
     print(tl_log("on").format(bd_bot.user.name, bd_bot.user.discriminator))
 
@@ -66,21 +76,21 @@ async def on_ready():
 
     if not guild:
         print(tl_log("guild_error").format(config["guild_id"]))
-        shutdown()
+        await shutdown()
         return
 
     channel = bd_bot.get_channel(int(config["channel_id"]))
 
     if not channel or not isinstance(channel, discord.TextChannel):
         print(tl_log("channel_error").format(config["channel_id"]))
-        shutdown()
+        await shutdown()
         return
 
     role = discord.utils.get(guild.roles, name=config["role"])
 
     if not role:
         print(tl_log("role_error").format(config["role"]))
-        shutdown()
+        await shutdown()
         return
 
     utils.mpd(cursor)
@@ -100,10 +110,7 @@ async def on_ready():
 
 @bd_bot.command()
 async def ping(ctx):
-    ctx.message.delete()
-    log_command(ctx.author, ctx.command.name)
-    if not ctx.author.guild_permissions.administrator:
-        await ctx.send(tl_msg("no_perm").format(ctx.author.mention))
+    if not await check_command(ctx):
         return
 
     await ctx.send(tl_msg("ping").format(round(bd_bot.latency * 1000)))
@@ -113,36 +120,28 @@ async def ping(ctx):
 async def bdgro(ctx):
     global status
 
-    ctx.message.delete()
-    log_command(ctx.author, ctx.command.name)
-    if not ctx.author.guild_permissions.administrator:
-        await ctx.send(tl_msg("no_perm").format(ctx.author.mention))
+    if not await check_command(ctx):
         return
 
     if not status:
-        await ctx.send(tl_msg("open").format(
-            discord.utils.get(bd_bot.get_guild(config["server_id"]).roles, name=config["role"])
-        ))
-        await channel.edit(name=tl_msg("status").format(tl_msg("status_open")))
-        status = True
+        #await channel.edit(name=tl_msg("status").format(tl_msg("status_open")))
+        await ctx.send(tl_msg("open").format(role.mention))
     else:
+        #await channel.edit(name=tl_msg("status").format(tl_msg("status_close")))
         await ctx.send(tl_msg("close"))
-        await channel.edit(name=tl_msg("status").format(tl_msg("status_close")))
-        status = False
+    status = not status
 
 
 @bd_bot.command()
 async def stop(ctx):
     global connexion
     global cursor
+    global status
 
-    ctx.message.delete()
-    log_command(ctx.author, ctx.command.name)
-    if not ctx.author.guild_permissions.administrator:
-        await ctx.send(tl_msg("no_perm").format(ctx.author.mention))
+    if not await check_command(ctx):
         return
 
-    shutdown()
+    await shutdown()
 
 
 if __name__ == "__main__":
