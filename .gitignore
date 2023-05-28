@@ -1,5 +1,5 @@
 .idea
 __pycache__
 bdgro.db
-token.txt
 bdgro.lo1
+config.json

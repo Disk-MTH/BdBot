@@ -8,14 +8,14 @@
         "db_off": "Database disconnected",
       "on": "Bot connected as {}#{}",
       "off": "Bot disconnected",
+      "purge": "Messages and threads deleted",
       "command": "{} used the command {} at {}"
     }
   ],
   "msg": [
     {
       "no_perm": "You don't have the permission to use this command",
-      "ping": "The latency is {}ms",
-      "stop": "Bot is shutting down"
+      "ping": "The latency is {}ms"
     }
   ]
 }
