@@ -24,6 +24,7 @@ async def ping(ctx):
 async def stop(ctx):
     log_command(ctx.author, ctx.command.name)
     print("Bot disconnected")
+    await ctx.send("Le bot est déconnecté")
     await bd_bot.close()
 
 
@@ -39,7 +40,7 @@ if __name__ == "__main__":
     print("Database tables creation")
     utils.mdp(cursor)
 
-    bd_bot.run(open('token.txt', 'r').read())
+    bd_bot.run(open("token.txt", "r").read())
 
     print("Database disconnection")
     cursor.close()
