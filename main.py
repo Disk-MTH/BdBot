@@ -17,10 +17,12 @@ language = config["language"]
 connexion = sqlite3.connect(config["db_name"])
 cursor = connexion.cursor()
 
+guild = None
 channel = None
-messages = []
+role = None
 
 status = False
+messages = []
 
 
 def tl_log(key):
@@ -41,20 +43,44 @@ def log_command(user, command, *args):
     print(tl_log("command").format(user, command, args, utils.get_date_time()))
 
 
+def shutdown():
+    await bd_bot.close()
+    print(tl_log("off"))
+
+    cursor.close()
+    connexion.close()
+    print(tl_log("db_off"))
+
+
 @bd_bot.event
 async def on_ready():
     global connexion
     global cursor
+    global guild
     global channel
+    global role
 
     print(tl_log("on").format(bd_bot.user.name, bd_bot.user.discriminator))
+
+    guild = bd_bot.get_guild(int(config["guild_id"]))
+
+    if not guild:
+        print(tl_log("guild_error").format(config["guild_id"]))
+        shutdown()
+        return
 
     channel = bd_bot.get_channel(int(config["channel_id"]))
 
     if not channel or not isinstance(channel, discord.TextChannel):
         print(tl_log("channel_error").format(config["channel_id"]))
-        print(tl_log("off"))
-        await bd_bot.close()
+        shutdown()
+        return
+
+    role = discord.utils.get(guild.roles, name=config["role"])
+
+    if not role:
+        print(tl_log("role_error").format(config["role"]))
+        shutdown()
         return
 
     utils.mpd(cursor)
@@ -116,12 +142,7 @@ async def stop(ctx):
         await ctx.send(tl_msg("no_perm").format(ctx.author.mention))
         return
 
-    print(tl_log("off"))
-    await bd_bot.close()
-
-    cursor.close()
-    connexion.close()
-    print(tl_log("db_off"))
+    shutdown()
 
 
 if __name__ == "__main__":
