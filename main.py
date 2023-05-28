@@ -1,10 +1,9 @@
 import json
 import os
-
-import utils
 import sqlite3
 import discord
 import tradlib
+import datetime
 from discord.ext import commands
 
 intents = discord.Intents.default()
@@ -39,13 +38,48 @@ def tl_thread(key):
     return tradlib.get_translation(language, ["thread", 0, key])
 
 
-def log_command(user, command, *args):
-    print(tl_log("command").format(user, command, args, utils.get_date_time()))
+def mpd():
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS category
+        (
+            category_id   INTEGER PRIMARY KEY AUTOINCREMENT,
+            category_name VARCHAR(1000) NOT NULL
+        );
+        """
+    )
+
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS price
+        (
+            price_id   INTEGER PRIMARY KEY AUTOINCREMENT,
+            buy_price  DOUBLE,
+            sell_price DOUBLE
+        );
+        """
+    )
+
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS product
+        (
+            product_id    INTEGER PRIMARY KEY AUTOINCREMENT,
+            product_name  VARCHAR(1000) NOT NULL,
+            product_stock INT,
+            product_picture,
+            price_id      INT           NOT NULL,
+            category_id   INT           NOT NULL,
+            FOREIGN KEY (price_id) REFERENCES price (price_id),
+            FOREIGN KEY (category_id) REFERENCES category (category_id)
+        );
+        """
+    )
 
 
 async def check_command(ctx):
     await ctx.message.delete()
-    print(tl_log("command").format(ctx.author, ctx.command.name, 0, utils.get_date_time()))
+    print(tl_log("command").format(ctx.author, ctx.command.name, 0, datetime.datetime.now().strftime("%d/%m/%Y-%H:%M:%S")))
     if not ctx.author.guild_permissions.administrator:
         await ctx.send(tl_msg("no_perm").format(ctx.command.name))
         return False
@@ -93,7 +127,7 @@ async def on_ready():
         await shutdown()
         return
 
-    utils.mpd(cursor)
+    mpd()
     print(tl_log("db_on"))
 
     await channel.purge(limit=None)
@@ -124,10 +158,12 @@ async def bdgro(ctx):
         return
 
     if not status:
-        #await channel.edit(name=tl_msg("status").format(tl_msg("status_open")))
+        if bool(config["change_name"]):
+            await channel.edit(name=tl_msg("status").format(tl_msg("status_open")))
         await ctx.send(tl_msg("open").format(role.mention))
     else:
-        #await channel.edit(name=tl_msg("status").format(tl_msg("status_close")))
+        if bool(config["change_name"]):
+            await channel.edit(name=tl_msg("status").format(tl_msg("status_close")))
         await ctx.send(tl_msg("close"))
     status = not status
 
