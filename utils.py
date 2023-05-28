@@ -1,7 +1,7 @@
 import datetime
 
 
-def mdp(cursor):
+def mpd(cursor):
     cursor.execute(
         """
         CREATE TABLE IF NOT EXISTS category
