@@ -21,7 +21,7 @@ channel = None
 role = None
 
 status = False
-messages = []
+messages = {}
 
 
 def tl_log(key):
@@ -33,8 +33,6 @@ def tl_msg(key):
 
 
 def tl_thread(key):
-    if key == "":
-        return tradlib.get_translation(language, ["thread", 0])
     return tradlib.get_translation(language, ["thread", 0, key])
 
 
@@ -150,12 +148,32 @@ async def on_ready():
 
     await channel.send(tl_msg("closed"), file=picture("closed", False))
 
-    for key in tl_thread(""):
-        await channel.create_thread(name=tl_thread(key))
-        print(tl_log("thread").format(tl_thread(key)))
+    cursor.execute(
+        """
+        SELECT category_name 
+        FROM category;
+        """
+    )
 
-    #create messages
+    for category in [category[0] for category in cursor.fetchall()]:
+        thread = await channel.create_thread(name=tl_thread(category))
 
+        cursor.execute(
+            f"""
+            SELECT product_id, product_name, product_stock, product_picture, sell_price 
+            FROM product
+                    JOIN category ON product.category_id = category.category_id
+                    JOIN price ON product.price_id = price.price_id
+            WHERE category_name = '{category}';
+            """
+        )
+
+        for product_id, product_name, product_stock, product_picture, product_sell_price in cursor.fetchall():
+            messages[product_id] = await thread.send(
+                tl_msg("product").format(product_name, product_sell_price, product_stock),
+                file=picture(product_picture)
+            )
+            #print(tl_log("product").format(product_name))
 
     print(tl_log("ready"))
 

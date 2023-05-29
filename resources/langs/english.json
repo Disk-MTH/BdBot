@@ -26,14 +26,16 @@
       "ping": "The latency is {}ms",
       "open": "Hey {}! The Bdgro is open! Come and get your sweets and drinks!",
       "closed": "Ohhhh nooooo! The Bdgro is closed! Come back later!",
-      "channel": "bdgro"
+      "channel": "bdgro",
+      "product": "{}: {}€, {} in stocks"
     }
   ],
   "thread": [
     {
       "drink": "Drinks",
       "sweet": "Sweets",
-      "salty": "Salty"
+      "salty": "Salty",
+      "meal": "Meals"
     }
   ]
 }
