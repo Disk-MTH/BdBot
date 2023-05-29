@@ -1,6 +1,4 @@
 .idea
 __pycache__
-resources/bdgro.db
 bdgro.lo1
 resources/config.json
-resources/bdgro.db
