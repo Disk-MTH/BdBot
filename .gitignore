@@ -2,4 +2,4 @@
 __pycache__
 bdgro.db
 bdgro.lo1
-config.json
+resources/config.json

@@ -18,6 +18,8 @@
       "interaction": "{} clicked on {}, {} at {}",
       "thread": "Thread {} has been created",
       "product": "Product {} has been created",
+      "stock": "Product {} has been modified from {} to {} by {}",
+      "mp_price": "{} has get the buy price of {}€ for {} in mp",
       "ready": "Bot ready"
     }
   ],
@@ -29,7 +31,11 @@
       "open": "Hey {}! The Bdgro is open! Come and get your sweets and drinks!",
       "closed": "Ohhhh nooooo! The Bdgro is closed! Come back later!",
       "channel": "bdgro",
-      "product": "{}: {}€, {} in stocks"
+      "product": "{}: {}€, {} in stocks",
+      "mp_price": "The buy price of {} is {}€",
+      "add": "Add 1 to stock",
+      "remove": "Remove 1 to stock",
+      "get": "Get the buy price"
     }
   ],
   "thread": [
