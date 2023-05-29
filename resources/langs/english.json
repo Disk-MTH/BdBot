@@ -14,15 +14,17 @@
       "picture_error": "The picture {} was not found. Product: {}",
       "channel_set": "Channel set to {}",
       "purge": "Messages and threads deleted",
-      "command": "{} used the command {} with args {} at {}",
+      "command": "{} used the command {} at {}",
+      "interaction": "{} clicked on {}, {} at {}",
       "thread": "Thread {} has been created",
+      "product": "Product {} has been created",
       "ready": "Bot ready"
     }
   ],
   "msg": [
     {
       "help": "Available commands: {}",
-      "no_perm": "You don't have the permission to use the command {}",
+      "no_perm": "You don't have the permission to do that: {}",
       "ping": "The latency is {}ms",
       "open": "Hey {}! The Bdgro is open! Come and get your sweets and drinks!",
       "closed": "Ohhhh nooooo! The Bdgro is closed! Come back later!",

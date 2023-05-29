@@ -5,6 +5,7 @@ import discord
 import tradlib
 import datetime
 from discord.ext import commands
+from discord.ui import Button, View
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -13,8 +14,8 @@ bd_bot = commands.Bot(command_prefix="!", intents=intents)
 config = json.load(open("config.json", "r"))
 language = config["language"]
 
-connexion = sqlite3.connect(config["db_name"])
-cursor = connexion.cursor()
+connexion = None
+cursor = None
 
 guild = None
 channel = None
@@ -39,58 +40,33 @@ def tl_thread(key):
 def picture(name, product=True):
     try:
         if product:
-            return discord.File(f"resources/pictures/{name}.png")
+            return discord.File(f"resources/pictures/products/{name}.png")
         return discord.File(f"resources/pictures/{name}.png")
     except FileNotFoundError:
         print(tl_log("picture_error").format(name, product))
         return discord.File(f"resources/pictures/not_found.png")
 
 
-def mpd():
-    cursor.execute(
-        """
-        CREATE TABLE IF NOT EXISTS category
-        (
-            category_id   INTEGER PRIMARY KEY AUTOINCREMENT,
-            category_name VARCHAR(1000) NOT NULL
-        );
-        """
-    )
-
-    cursor.execute(
-        """
-        CREATE TABLE IF NOT EXISTS price
-        (
-            price_id   INTEGER PRIMARY KEY AUTOINCREMENT,
-            buy_price  DOUBLE,
-            sell_price DOUBLE NOT NULL
-        );
-        """
-    )
-
-    cursor.execute(
-        """
-        CREATE TABLE IF NOT EXISTS product
-        (
-            product_id    INTEGER PRIMARY KEY AUTOINCREMENT,
-            product_name  VARCHAR(1000) NOT NULL,
-            product_stock INT NOT NULL,
-            product_picture VARCHAR(1000),
-            price_id      INT           NOT NULL,
-            category_id   INT           NOT NULL,
-            FOREIGN KEY (price_id) REFERENCES price (price_id),
-            FOREIGN KEY (category_id) REFERENCES category (category_id)
-        );
-        """
-    )
-
-
 async def check_command(ctx):
     await ctx.message.delete()
-    print(tl_log("command").format(ctx.author, ctx.command.name, 0, datetime.datetime.now().strftime("%d/%m/%Y-%H:%M:%S")))
     if not ctx.author.guild_permissions.administrator:
         await ctx.send(tl_msg("no_perm").format(ctx.command.name))
         return False
+    print(tl_log("command").format(ctx.author,
+                                   ctx.command.name,
+                                   datetime.datetime.now().strftime("%d/%m/%Y-%H:%M:%S")))
+    return True
+
+
+async def check_interaction(interaction, label):
+    if not interaction.user.guild_permissions.administrator:
+        await interaction.response.send_message(tl_msg("no_perm").format(label),
+                                                ephemeral=True)
+        return False
+    print(tl_log("interaction").format(interaction.user,
+                                       messages.get(interaction.message.id),  # sql query to get product name
+                                       label,
+                                       datetime.datetime.now().strftime("%d/%m/%Y-%H:%M:%S")))
     return True
 
 
@@ -135,7 +111,8 @@ async def on_ready():
         await shutdown()
         return
 
-    mpd()
+    connexion = sqlite3.connect(config["db_name"])
+    cursor = connexion.cursor()
     print(tl_log("db_on"))
 
     await channel.purge(limit=None)
@@ -160,7 +137,7 @@ async def on_ready():
 
         cursor.execute(
             f"""
-            SELECT product_id, product_name, product_stock, product_picture, sell_price 
+            SELECT product_id, product_name, product_stock, product_picture, buy_price, sell_price 
             FROM product
                     JOIN category ON product.category_id = category.category_id
                     JOIN price ON product.price_id = price.price_id
@@ -168,12 +145,51 @@ async def on_ready():
             """
         )
 
-        for product_id, product_name, product_stock, product_picture, product_sell_price in cursor.fetchall():
-            messages[product_id] = await thread.send(
+        for product_id, product_name, product_stock, product_picture, product_buy_price, product_sell_price \
+                in cursor.fetchall():
+
+            re_stock = Button(label="Add", style=discord.ButtonStyle.green)
+
+            async def re_stock_callback(interaction):
+                if await check_interaction(interaction, re_stock.label):
+                    # sql query to add stock
+                    # log
+                    pass
+
+            re_stock.callback = re_stock_callback
+
+
+
+            de_stock = Button(label="Remove", style=discord.ButtonStyle.red)
+
+            async def de_stock_callback(interaction):
+                if await check_interaction(interaction, de_stock.label):
+                    # sql query to remove stock
+                    # log
+                    pass
+
+            de_stock.callback = de_stock_callback
+
+
+
+            get_price = Button(label="Get", style=discord.ButtonStyle.blurple)
+
+            async def get_price_callback(interaction):
+                if await check_interaction(interaction, get_price.label):
+                    # private message to the user with the sell price
+                    await interaction.user.send(product_sell_price)
+                    # log
+
+            get_price.callback = get_price_callback
+
+
+            message = await thread.send(
                 tl_msg("product").format(product_name, product_sell_price, product_stock),
-                file=picture(product_picture)
+                file=picture(product_picture), view=View().add_item(re_stock).add_item(de_stock).add_item(get_price)
             )
-            #print(tl_log("product").format(product_name))
+            messages[message.id] = product_id
+
+            print(tl_log("product").format(product_name))
 
     print(tl_log("ready"))
 
