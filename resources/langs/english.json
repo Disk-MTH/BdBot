@@ -11,6 +11,7 @@
       "guild_error": "The guild {} is not a valid guild",
       "channel_error": "The channel {} is not a valid channel",
       "role_error": "The role {} is not a valid role",
+      "picture_error": "The picture {} was not found. Product: {}",
       "channel_set": "Channel set to {}",
       "purge": "Messages and threads deleted",
       "command": "{} used the command {} with args {} at {}",
@@ -25,9 +26,7 @@
       "ping": "The latency is {}ms",
       "open": "Hey {}! The Bdgro is open! Come and get your sweets and drinks!",
       "closed": "Ohhhh nooooo! The Bdgro is closed! Come back later!",
-      "channel": "bdgro",
-      "status_open": "\uD83D\uDFE2",
-      "status_close": "\uD83D\uDD34"
+      "channel": "bdgro"
     }
   ],
   "thread": [

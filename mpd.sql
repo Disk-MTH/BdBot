@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS category
 CREATE TABLE IF NOT EXISTS price
 (
     price_id   INTEGER PRIMARY KEY AUTOINCREMENT,
-    buy_price  DOUBLE,
+    buy_price  DOUBLE NOT NULL,
     sell_price DOUBLE
 );
 
@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS product
 (
     product_id    INTEGER PRIMARY KEY AUTOINCREMENT,
     product_name  VARCHAR(1000) NOT NULL,
-    product_stock INT,
-    product_picture,
+    product_stock INT NOT NULL,
+    product_picture VARCHAR(1000),
     price_id      INT           NOT NULL,
     category_id   INT           NOT NULL,
     FOREIGN KEY (price_id) REFERENCES price (price_id),

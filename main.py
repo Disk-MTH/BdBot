@@ -21,7 +21,6 @@ channel = None
 role = None
 
 status = False
-
 messages = []
 
 
@@ -37,6 +36,16 @@ def tl_thread(key):
     if key == "":
         return tradlib.get_translation(language, ["thread", 0])
     return tradlib.get_translation(language, ["thread", 0, key])
+
+
+def picture(name, product=True):
+    try:
+        if product:
+            return discord.File(f"resources/pictures/{name}.png")
+        return discord.File(f"resources/pictures/{name}.png")
+    except FileNotFoundError:
+        print(tl_log("picture_error").format(name, product))
+        return discord.File(f"resources/pictures/not_found.png")
 
 
 def mpd():
@@ -56,7 +65,7 @@ def mpd():
         (
             price_id   INTEGER PRIMARY KEY AUTOINCREMENT,
             buy_price  DOUBLE,
-            sell_price DOUBLE
+            sell_price DOUBLE NOT NULL
         );
         """
     )
@@ -67,8 +76,8 @@ def mpd():
         (
             product_id    INTEGER PRIMARY KEY AUTOINCREMENT,
             product_name  VARCHAR(1000) NOT NULL,
-            product_stock INT,
-            product_picture,
+            product_stock INT NOT NULL,
+            product_picture VARCHAR(1000),
             price_id      INT           NOT NULL,
             category_id   INT           NOT NULL,
             FOREIGN KEY (price_id) REFERENCES price (price_id),
@@ -139,7 +148,7 @@ async def on_ready():
     await channel.edit(name=tl_msg("channel"))
     print(tl_log("channel_set").format(channel.name))
 
-    await channel.send(tl_msg("closed"), file=discord.File("resources/pictures/closed.png"))
+    await channel.send(tl_msg("closed"), file=picture("closed", False))
 
     for key in tl_thread(""):
         await channel.create_thread(name=tl_thread(key))
@@ -168,9 +177,9 @@ async def bdgro(ctx):
 
     await channel.purge(limit=None)
     if not status:
-        await channel.send(tl_msg("open").format(role.mention), file=discord.File("resources/pictures/open.png"))
+        await channel.send(tl_msg("open").format(role.mention), file=picture("open", False))
     else:
-        await channel.send(tl_msg("closed"), file=discord.File("resources/pictures/closed.png"))
+        await channel.send(tl_msg("closed"), file=picture("closed", False))
     status = not status
 
 
