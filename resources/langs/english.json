@@ -11,10 +11,11 @@
       "guild_error": "The guild {} is not a valid guild",
       "channel_error": "The channel {} is not a valid channel",
       "role_error": "The role {} is not a valid role",
+      "channel_set": "Channel set to {}",
       "purge": "Messages and threads deleted",
       "command": "{} used the command {} with args {} at {}",
       "thread": "Thread {} has been created",
-      "threads": "{} threads have been created"
+      "ready": "Bot ready"
     }
   ],
   "msg": [
@@ -23,8 +24,8 @@
       "no_perm": "You don't have the permission to use the command {}",
       "ping": "The latency is {}ms",
       "open": "Hey {}! The Bdgro is open! Come and get your sweets and drinks!",
-      "close": "Ohhhh nooooo! The Bdgro is closed! Come back later!",
-      "status": "bd{}gro",
+      "closed": "Ohhhh nooooo! The Bdgro is closed! Come back later!",
+      "channel": "bdgro",
       "status_open": "\uD83D\uDFE2",
       "status_close": "\uD83D\uDD34"
     }

@@ -21,6 +21,7 @@ channel = None
 role = None
 
 status = False
+
 messages = []
 
 
@@ -135,11 +136,19 @@ async def on_ready():
         await thread.delete()
     print(tl_log("purge"))
 
+    await channel.edit(name=tl_msg("channel"))
+    print(tl_log("channel_set").format(channel.name))
+
+    await channel.send(tl_msg("closed"), file=discord.File("resources/pictures/closed.png"))
+
     for key in tl_thread(""):
         await channel.create_thread(name=tl_thread(key))
         print(tl_log("thread").format(tl_thread(key)))
 
-    print(tl_log("threads").format(len(channel.threads)))
+    #create messages
+
+
+    print(tl_log("ready"))
 
 
 @bd_bot.command()
@@ -157,31 +166,16 @@ async def bdgro(ctx):
     if not await check_command(ctx):
         return
 
+    await channel.purge(limit=None)
     if not status:
-        if bool(config["change_name"]):
-            await channel.edit(name=tl_msg("status").format(tl_msg("status_open")))
-        await ctx.send(tl_msg("open").format(role.mention))
+        await channel.send(tl_msg("open").format(role.mention), file=discord.File("resources/pictures/open.png"))
     else:
-        if bool(config["change_name"]):
-            await channel.edit(name=tl_msg("status").format(tl_msg("status_close")))
-        await ctx.send(tl_msg("close"))
+        await channel.send(tl_msg("closed"), file=discord.File("resources/pictures/closed.png"))
     status = not status
 
 
-@bd_bot.command()
-async def stop(ctx):
-    global connexion
-    global cursor
-    global status
-
-    if not await check_command(ctx):
-        return
-
-    await shutdown()
-
-
 if __name__ == "__main__":
-    tradlib.set_translations_files_path(os.getcwd() + "\\lang")
+    tradlib.set_translations_files_path(os.getcwd() + "\\resources\\langs")
     tradlib.set_translation_files_extension(".json")
     tradlib.load_translations_files()
 
