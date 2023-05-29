@@ -4,6 +4,7 @@ import utils
 import sqlite3
 import discord
 import tradlib
+import buttons
 from discord.ext import commands
 from discord.ui import Button, View
 
@@ -25,7 +26,6 @@ role = None
 
 status = False
 messages = {}
-
 
 """---------------------------------------- Bot events ----------------------------------------"""
 
@@ -66,6 +66,7 @@ async def on_ready():
     """------------------------------ Connect to database ------------------------------"""
     connexion = sqlite3.connect(config["db_name"])
     cursor = connexion.cursor()
+    utils.mpd(cursor)
     print(utils.tl_log("db_on"))
 
     """------------------------------ Prepare the bot channel ------------------------------"""
@@ -103,39 +104,33 @@ async def on_ready():
         for product_id, product_name, product_stock, product_picture, product_buy_price, product_sell_price \
                 in cursor.fetchall():  # walk through products
 
-            re_stock = Button(label=utils.tl_msg("add"), style=discord.ButtonStyle.green)
+            """--------------------- Create buttons --------------------"""
+            re_stock = buttons.StockButton(label=utils.tl_msg("add"),
+                                           style=discord.ButtonStyle.green,
+                                           product_name=product_name,
+                                           product_sell_price=product_sell_price,
+                                           connexion=connexion,
+                                           cursor=cursor,
+                                           remove=False)
 
-            async def re_stock_callback(interaction):
-                if await utils.check_interaction(interaction, re_stock.label, product_name):
-                    # sql query to add stock
-                    # log
-                    pass
+            de_stock = buttons.StockButton(label=utils.tl_msg("remove"),
+                                           style=discord.ButtonStyle.red,
+                                           product_name=product_name,
+                                           product_sell_price=product_sell_price,
+                                           connexion=connexion,
+                                           cursor=cursor,
+                                           remove=True)
 
-            re_stock.callback = re_stock_callback
+            get_price = buttons.PriceButton(label=utils.tl_msg("get"),
+                                            style=discord.ButtonStyle.blurple,
+                                            product_name=product_name,
+                                            product_buy_price=product_buy_price)
 
-            de_stock = Button(label=utils.tl_msg("remove"), style=discord.ButtonStyle.red)
-
-            async def de_stock_callback(interaction):
-                if await utils.check_interaction(interaction, de_stock.label, product_name):
-                    # sql query to remove stock
-                    # log
-                    pass
-
-            de_stock.callback = de_stock_callback
-
-            get_price = Button(label=utils.tl_msg("get"), style=discord.ButtonStyle.blurple)
-
-            async def get_price_callback(interaction):
-                if await utils.check_interaction(interaction, get_price.label, product_name):
-                    await interaction.user.send(utils.tl_msg("mp_price").format(product_name, product_buy_price))
-                    print(utils.tl_log("mp_price").format(interaction.user, product_buy_price, product_name))
-
-            get_price.callback = get_price_callback
-
+            """--------------------- Send message --------------------"""
             message = await thread.send(
                 utils.tl_msg("product").format(product_name, product_sell_price, product_stock),
-                file=utils.picture(product_picture),
-                view=View().add_item(re_stock).add_item(de_stock).add_item(get_price)
+                file=utils.picture(product_picture),  # add picture
+                view=View().add_item(re_stock).add_item(de_stock).add_item(get_price)  # add buttons to view
             )
             messages[message.id] = product_id
 
@@ -171,7 +166,6 @@ async def bdgro(ctx):
 
 
 """---------------------------------------- Main script ----------------------------------------"""
-
 
 if __name__ == "__main__":
     tradlib.set_translations_files_path(os.getcwd() + "\\resources\\langs")
