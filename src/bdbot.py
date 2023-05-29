@@ -6,7 +6,7 @@ import discord
 import tradlib
 import buttons
 from discord.ext import commands
-from discord.ui import Button, View
+from discord.ui import View
 
 """---------------------------------------- Variables ----------------------------------------"""
 
@@ -64,9 +64,8 @@ async def on_ready():
         return
 
     """------------------------------ Connect to database ------------------------------"""
-    connexion = sqlite3.connect(config["db_name"])
+    connexion = sqlite3.connect("resources/" + config["db_name"])
     cursor = connexion.cursor()
-    utils.mpd(cursor)
     print(utils.tl_log("db_on"))
 
     """------------------------------ Prepare the bot channel ------------------------------"""
@@ -111,7 +110,8 @@ async def on_ready():
                                            product_sell_price=product_sell_price,
                                            connexion=connexion,
                                            cursor=cursor,
-                                           remove=False)
+                                           thread=thread,
+                                           bot_id=bd_bot.user.id)
 
             de_stock = buttons.StockButton(label=utils.tl_msg("remove"),
                                            style=discord.ButtonStyle.red,
@@ -119,7 +119,7 @@ async def on_ready():
                                            product_sell_price=product_sell_price,
                                            connexion=connexion,
                                            cursor=cursor,
-                                           remove=True)
+                                           stock_modif=-1)
 
             get_price = buttons.PriceButton(label=utils.tl_msg("get"),
                                             style=discord.ButtonStyle.blurple,
@@ -130,7 +130,7 @@ async def on_ready():
             message = await thread.send(
                 utils.tl_msg("product").format(product_name, product_sell_price, product_stock),
                 file=utils.picture(product_picture),  # add picture
-                view=View().add_item(re_stock).add_item(de_stock).add_item(get_price)  # add buttons to view
+                view=View().add_item(re_stock).add_item(de_stock).add_item(get_price)
             )
             messages[message.id] = product_id
 

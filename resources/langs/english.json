@@ -33,9 +33,10 @@
       "channel": "bdgro",
       "product": "{}: {}€, {} in stocks",
       "mp_price": "The buy price of {} is {}€",
-      "add": "Add 1 to stock",
-      "remove": "Remove 1 to stock",
-      "get": "Get the buy price"
+      "add": "Add from message",
+      "remove": "Remove 1",
+      "get": "Get buy price",
+      "bad_value": "The value {} is not a valid value for stock modification"
     }
   ],
   "thread": [
