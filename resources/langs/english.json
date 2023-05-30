@@ -26,7 +26,7 @@
     {
       "no_perm": "You don't have the permission to do that: {}",
       "ping": "The latency is {}ms",
-      "channel": "bdgro",
+      "channel": "\uD83D\uDD14bdgro\uD83D\uDD14",
       "open": "Hey {}! The Bdgro is open! Come and get your sweets and drinks!",
       "closed": "Ohhhh nooooo! The Bdgro is closed! Come back later!",
       "product": "{}: {}€, {} in stocks",
@@ -39,11 +39,11 @@
   ],
   "thread": [
     {
-      "drink": "Drinks",
-      "sweet": "Sweets",
-      "salty": "Salty",
-      "meal": "Meals",
-      "special": "Specials"
+      "drink": "\uD83C\uDF79-Drinks",
+      "sweet": "\uD83C\uDF70-Sweets",
+      "salty": "\uD83E\uDD6A-Salty",
+      "meal": "\uD83C\uDF54-Meals",
+      "special": "\uD83E\uDD5E-Specials"
     }
   ]
 }
