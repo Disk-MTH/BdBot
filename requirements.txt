@@ -1,0 +1,2 @@
+discord~=2.2.3
+tradlib~=0.4
