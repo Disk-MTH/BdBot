@@ -2,7 +2,6 @@
   "language": "english",
   "log": [
     {
-      "languages": "Available languages: {}",
       "language": "Language set to {}",
       "db_on": "Database connected",
       "db_off": "Database disconnected",
@@ -12,12 +11,12 @@
       "channel_error": "The channel {} is not a valid channel",
       "role_error": "The role {} is not a valid role",
       "picture_error": "The picture {} was not found. Product: {}",
-      "channel_set": "Channel set to {}",
+      "channel": "Channel set to {}",
+      "thread": "Thread {} has been created",
+      "product": "Product {} has been created",
       "purge": "Messages and threads deleted",
       "command": "{} used the command {} at {}",
       "interaction": "{} clicked on {}, {} at {}",
-      "thread": "Thread {} has been created",
-      "product": "Product {} has been created",
       "stock": "Product {} has been modified from {} to {} by {}",
       "mp_price": "{} has get the buy price of {}€ for {} in mp",
       "ready": "Bot ready"
@@ -25,18 +24,17 @@
   ],
   "msg": [
     {
-      "help": "Available commands: {}",
       "no_perm": "You don't have the permission to do that: {}",
       "ping": "The latency is {}ms",
+      "channel": "bdgro",
       "open": "Hey {}! The Bdgro is open! Come and get your sweets and drinks!",
       "closed": "Ohhhh nooooo! The Bdgro is closed! Come back later!",
-      "channel": "bdgro",
       "product": "{}: {}€, {} in stocks",
+      "bad_value": "The value {} is not a valid value for stock modification",
       "mp_price": "The buy price of {} is {}€",
-      "add": "Add from message",
-      "remove": "Remove 1",
-      "get": "Get buy price",
-      "bad_value": "The value {} is not a valid value for stock modification"
+      "btn_add": "Add from message",
+      "btn_remove": "Remove 1",
+      "btn_get": "Get buy price"
     }
   ],
   "thread": [
@@ -44,7 +42,8 @@
       "drink": "Drinks",
       "sweet": "Sweets",
       "salty": "Salty",
-      "meal": "Meals"
+      "meal": "Meals",
+      "special": "Specials"
     }
   ]
 }

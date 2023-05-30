@@ -76,7 +76,7 @@ async def on_ready():
     print(utils.tl_log("purge"))
 
     await channel.edit(name=utils.tl_msg("channel"))
-    print(utils.tl_log("channel_set").format(channel.name))
+    print(utils.tl_log("channel").format(channel.name))
 
     """------------------------------ Create products ------------------------------"""
     cursor.execute(
@@ -103,7 +103,7 @@ async def on_ready():
                 in cursor.fetchall():  # walk through products
 
             """--------------------- Create buttons --------------------"""
-            re_stock = buttons.StockButton(label=utils.tl_msg("add"),
+            re_stock = buttons.StockButton(label=utils.tl_msg("btn_add"),
                                            style=discord.ButtonStyle.green,
                                            product_name=product_name,
                                            product_sell_price=product_sell_price,
@@ -112,14 +112,14 @@ async def on_ready():
                                            thread=thread,
                                            bot_id=bd_bot.user.id)
 
-            de_stock = buttons.StockButton(label=utils.tl_msg("remove"),
+            de_stock = buttons.StockButton(label=utils.tl_msg("btn_remove"),
                                            style=discord.ButtonStyle.red,
                                            product_name=product_name,
                                            product_sell_price=product_sell_price,
                                            connexion=connexion,
                                            cursor=cursor)
 
-            get_price = buttons.PriceButton(label=utils.tl_msg("get"),
+            get_price = buttons.PriceButton(label=utils.tl_msg("btn_get"),
                                             style=discord.ButtonStyle.blurple,
                                             product_name=product_name,
                                             product_buy_price=product_buy_price)
@@ -172,8 +172,6 @@ if __name__ == "__main__":
     tradlib.set_translations_files_path(os.getcwd() + "\\resources\\langs")
     tradlib.set_translation_files_extension(".json")
     tradlib.load_translations_files()
-
-    print(utils.tl_log("languages").format(tradlib.get_available_languages()))
     print(utils.tl_log("language").format(language))
 
     bd_bot.run(config["token"])
