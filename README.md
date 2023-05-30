@@ -18,3 +18,5 @@
 - guild_id: ID of the guild (discord server)
 - channel_id: ID of the channel (discord text channel)
 - role: Name of the role to ping with alert (discord role)
+
+docker build --tag bdbot:1.0 .
