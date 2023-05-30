@@ -9,32 +9,29 @@ class ProductButton(Button):
 
 
 class StockButton(ProductButton):
-    def __init__(self, label, style, product_name, product_sell_price, connexion, cursor, thread=None, bot_id=None,
-                 stock_modif=0):
+    def __init__(self, label, style, product_name, product_sell_price, connexion, cursor, thread=None, bot_id=None):
         super().__init__(label=label, style=style, product_name=product_name)
         self.product_sell_price = product_sell_price
         self.connexion = connexion
         self.cursor = cursor
         self.thread = thread
         self.bot_id = bot_id
-        self.stock_modif = stock_modif
-        self.reset = stock_modif == 0
 
     async def callback(self, interaction):
         if await utils.check_interaction(interaction, self.label, self.product_name):
-            if self.stock_modif == 0:  # if stock_modif should be get from user message
+            stock_modif = 0
+            if self.thread is not None and self.bot_id is not None:  # if stock_modif should be get from user message
                 message = [message async for message in self.thread.history(limit=1)][0]
                 if message.author.id != self.bot_id:
                     await message.delete()
                     try:
-                        self.stock_modif = int(message.content)
+                        stock_modif = int(message.content)
                     except ValueError:
-                        pass
-
-                if self.stock_modif == 0:
-                    await interaction.response.send_message(utils.tl_msg("bad_value").format(message.content),
-                                                            ephemeral=True)
-                    return
+                        await interaction.response.send_message(utils.tl_msg("bad_value").format(message.content),
+                                                                ephemeral=True)
+                        return
+            else:
+                stock_modif = -1
 
             self.cursor.execute(
                 f"""
@@ -46,13 +43,13 @@ class StockButton(ProductButton):
 
             product_stock = self.cursor.fetchone()[0]
 
-            if product_stock + self.stock_modif < 0:  # if stock_modif is under the limit
-                self.stock_modif = -product_stock
+            if product_stock + stock_modif < 0:  # if stock_modif is under the limit
+                stock_modif = -product_stock
 
             self.cursor.execute(
                 f"""
                 UPDATE product
-                SET product_stock = product_stock + {self.stock_modif}
+                SET product_stock = product_stock + {stock_modif}
                 WHERE product_name = '{self.product_name}';
                 """
             )  # update product stock
@@ -61,17 +58,14 @@ class StockButton(ProductButton):
 
             print(utils.tl_log("stock").format(self.product_name,
                                                product_stock,
-                                               product_stock + self.stock_modif,
+                                               product_stock + stock_modif,
                                                interaction.user))
 
             await interaction.response.edit_message(
                 content=utils.tl_msg("product").format(self.product_name,
                                                        self.product_sell_price,
-                                                       product_stock + self.stock_modif)
+                                                       product_stock + stock_modif)
             )  # edit message with new stock
-
-            if self.reset:  # if stock_modif should be get from user message reset the detection
-                self.stock_modif = 0
 
 
 class PriceButton(ProductButton):

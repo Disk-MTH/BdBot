@@ -6,6 +6,7 @@ import discord
 import tradlib
 import buttons
 from discord.ext import commands
+from discord import ChannelType
 from discord.ui import View
 
 """---------------------------------------- Variables ----------------------------------------"""
@@ -77,8 +78,6 @@ async def on_ready():
     await channel.edit(name=utils.tl_msg("channel"))
     print(utils.tl_log("channel_set").format(channel.name))
 
-    await channel.send(utils.tl_msg("closed"), file=utils.picture("closed", False))
-
     """------------------------------ Create products ------------------------------"""
     cursor.execute(
         """
@@ -88,7 +87,7 @@ async def on_ready():
     )  # get categories
 
     for category in [category[0] for category in cursor.fetchall()]:  # walk through categories
-        thread = await channel.create_thread(name=utils.tl_thread(category))  # create thread
+        thread = await channel.create_thread(name=utils.tl_thread(category), type=ChannelType.public_thread)
 
         cursor.execute(
             f"""
@@ -118,8 +117,7 @@ async def on_ready():
                                            product_name=product_name,
                                            product_sell_price=product_sell_price,
                                            connexion=connexion,
-                                           cursor=cursor,
-                                           stock_modif=-1)
+                                           cursor=cursor)
 
             get_price = buttons.PriceButton(label=utils.tl_msg("get"),
                                             style=discord.ButtonStyle.blurple,
@@ -135,6 +133,9 @@ async def on_ready():
             messages[message.id] = product_id
 
             print(utils.tl_log("product").format(product_name))
+
+    """------------------------------ Prepare the bot channel ------------------------------"""
+    await channel.send(utils.tl_msg("closed"), file=utils.picture("closed", False))
 
     print(utils.tl_log("ready"))
 
@@ -157,7 +158,7 @@ async def bdgro(ctx):
     if not await utils.check_command(ctx):
         return
 
-    await channel.purge(limit=None)
+    await channel.purge(limit=1)
     if not status:
         await channel.send(utils.tl_msg("open").format(role.mention), file=utils.picture("open", False))
     else:
